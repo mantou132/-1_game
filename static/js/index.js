@@ -1,12 +1,12 @@
 function Ship(ctx){
-	this.width = 157;
-	this.height = 117;
+	this.width = ctx.canvas.width * .4906;
+	this.height = ctx.canvas.width * .3656;
 	this.left = gameMonitor.w/2 - this.width/4;
 	this.top = gameMonitor.h - this.height;
 	this.player = gameMonitor.im.createImage(gameMonitor.fg.src);
 
 	this.paint = function(){
-		ctx.drawImage(this.player, 0, 0, this.width, this.height, this.left, this.top, this.width/2, this.height/2);
+		ctx.drawImage(this.player, this.left, this.top, this.width/2, this.height/2);
 	}
 
 	this.setPosition = function(event){
@@ -23,8 +23,8 @@ function Ship(ctx){
 		if(this.left<0){
 			this.left = 0;
 		}
-		if(this.left>320-this.width/2){
-			this.left = 320-this.width/2;
+		if(this.left>gameMonitor.w-this.width/2){
+			this.left = gameMonitor.w-this.width/2;
 		}
 		if(this.top<0){
 			this.top = 0;
@@ -93,31 +93,38 @@ function Food(type, left, id, ctx){
 	this.speedUpTime = 180;//3s
 	this.id = id;
 	this.type = type;
-	this.width = 50;
-	this.height = 50;
+	this.width = ctx.canvas.width * .16;
+	this.height = ctx.canvas.width * .16;
 	this.left = left;
-	this.top = -50;
+	this.top = -ctx.canvas.width * .16;
 	this.speed = 0.08 * Math.pow(1.1, Math.floor(gameMonitor.time/this.speedUpTime));
 	this.loop = 0;
 	this.angle = 0;
+	this.angleable = !(type || Math.random() < .8);
 
 	var icon = gameMonitor.icons[Math.floor(Math.random()*gameMonitor.icons.length)];
 	var p = this.type == 0 ? icon : gameMonitor.icon_fg.src;
+
 	this.pic = gameMonitor.im.createImage(p);
 }
 Food.prototype.paint = function(ctx){
-	// this.angle += Math.PI / 180;
-	// ctx.translate(this.left + this.width/2, this.top + this.height/2);
-	// ctx.rotate(this.angle);
-	ctx.drawImage(this.pic, this.left, this.top, this.width, this.height);
-	// ctx.rotate(-this.angle);
-	// ctx.translate(-this.left - this.width/2, -this.top - this.height/2);
+	this.angle += Math.PI / 180 * 10;
+	if(this.angleable){
+		ctx.translate(this.left + this.width/2, this.top + this.height/2);
+		ctx.rotate(this.angle);
+		ctx.drawImage(this.pic, -this.width/2, -this.height/2, this.width, this.height);
+		ctx.rotate(-this.angle);
+		ctx.translate(-this.left - this.width/2, -this.top - this.height/2);
+	}else{
+		ctx.drawImage(this.pic, this.left, this.top, this.width, this.height);
+	}
 }
 Food.prototype.move = function(ctx){
 	if(gameMonitor.time % this.speedUpTime == 0){
 		this.speed *= 1.3;
 	}
-	this.top += ++this.loop * this.speed;
+	this.loop += gameMonitor.h / 550;
+	this.top += this.loop * this.speed;
 	if(this.top>gameMonitor.h){
 	 	gameMonitor.foodList[this.id] = null;
 	}
@@ -158,38 +165,37 @@ function ImageMonitor(){
 
 
 var gameMonitor = {
-	w : 0,
-	h : 0,
-	bgWidth : 750,
-	bgHeight : 1334,
-	time : 0,
-	timmer : null,
-	bg : new Image(),
-	fg : new Image(),
-	icon_fg : new Image(),
-	bgSpeed : 2,
-	bgloop : 0,
-	score : 0,
-	im : new ImageMonitor,
-	foodList : [],
-	icons : [],
-	canvasId : 'stage',
-	//audio : new Audio(''),
-	bgDistance : 0,//背景位置
-	eventType : {
+	w : 0, //canvas宽度
+	h : 0, //canvas高度
+	time : 0, //计时
+	timmer : null, //计时器
+	bg : new Image(), // 背景图片
+	fg : new Image(), //前景图片
+	icon_fg : new Image(), // 加分图标
+	bgDistance : 0, //背景位置
+	score : 0, // 分数
+	im : new ImageMonitor, //图片缓存
+	foodList : [], //当前画布上的图片
+	icons : [], // 旧物列表
+	start : null, //动画状态
+	ctx : document.getElementById('stage').getContext('2d'), //canvas 2D上下文引用
+	//audio : new Audio(''), //加分播放音频
+	eventType : { // 事件模式
 		start : 'touchstart',
 		move : 'touchmove',
 		end : 'touchend'
-	},
+		},
 	init : function(w,h){
 		var _this = this;
 		_this.w = w;
 		_this.h = h;
 
-		var canvas = document.getElementById(_this.canvasId);
-		canvas.width = w;
-		canvas.height = h;
-		var ctx = canvas.getContext('2d');
+		_this.ctx.canvas.width = w;
+		_this.ctx.canvas.height = h;
+
+		//初始某些元件尺寸，适应设备尺寸
+		// $('#scorecontent').css('font-size',_this.w/35);
+		$(document.body).css('height',_this.h);
 
 		//绘制景
 		_this.bg.src = 'static/img/im_gamebg.png';
@@ -218,51 +224,38 @@ var gameMonitor = {
 		var loading = this.icons.concat(_this.bg.src,_this.fg.src,_this.icon_fg.src);
 
 		_this.bg.addEventListener('load', function () {
-			ctx.drawImage(_this.bg, 0, 0, _this.w, _this.h);
+			_this.ctx.drawImage(_this.bg, 0, 0, _this.w, _this.h);
 		}, false);
-
-		var loadingText = document.createElement('div');
-		loadingText.id = 'loadingText';
-		loadingText.textContent = 'loadding...';
-		loadingText.style.position = 'absolute';
-		loadingText.style.top = '0px';
-		loadingText.style.margin = 'auto';
-		loadingText.style.width = '100%';
-		loadingText.style.height = '1000px';
-		loadingText.style.paddingTop = '38px';
-		loadingText.style.textAlign = 'center';
-		loadingText.style.color = '#fff';
-		loadingText.style.backgroundColor = 'rgba(0,0,0,0.8)';
-		$(document.body).append(loadingText);
 
 		console.log('loding start...');
 		_this.im.loadImage(loading,function(){
-			loadingText.parentElement.removeChild(loadingText);
+			$('#loadingText').hide();
+			$('#guidePanel').css('background-image','url(static/img/ic_gguide.png),url(static/img/icon.png)')
 			console.log('loding end');
-			_this.initListener(ctx);
+			_this.initListener();
 		})
-},
+	},
 
-	initListener : function(ctx){
+	initListener : function(){
 		var _this = this;
 		var body = $(document.body);
 		$(document).on(gameMonitor.eventType.move, function(event){
 			event.preventDefault();
 		});
-		body.on(gameMonitor.eventType.start, '#replay', ctx, function(event){
+		body.on(gameMonitor.eventType.start, '#replay', function(event){
 			$('#resultPanel').hide();
 			_this.ship = new Ship(event.data);
       		_this.ship.controll();
       		_this.reset();
-			_this.run(event.data);
+			_this.run();
 		});
-		body.on(gameMonitor.eventType.start, '#share', ctx,function(event){
+		body.on(gameMonitor.eventType.start, '#share', function(event){
 			//???
 		});
-		body.on(gameMonitor.eventType.start, '#btn_1', ctx,function(event){
+		body.on(gameMonitor.eventType.start, '#btn_1', function(event){
 			//show +1 share page
 		});
-		body.on(gameMonitor.eventType.start, '#btn_9', ctx,function(event){
+		body.on(gameMonitor.eventType.start, '#btn_9', function(event){
 			//show 9 share page
 		});
 
@@ -272,10 +265,10 @@ var gameMonitor = {
 
 		body.on(gameMonitor.eventType.start, '#guidePanel', function(){
 			$(this).hide();
-			_this.ship = new Ship(ctx);
+			_this.ship = new Ship(_this.ctx);
 			_this.ship.paint();
       		_this.ship.controll();
-			_this.run(ctx);
+			_this.run();
 		});
 
 		// body.on(gameMonitor.eventType.start, '.share', function(){
@@ -285,22 +278,36 @@ var gameMonitor = {
 		// });
 
 	},
-/*	rollBg : function(ctx){
-		if(this.bgDistance>=this.bgHeight){
-			this.bgloop = 0;
+	//手动设置滚动位置 0.78
+	rollBg : function(){
+		var tag = 0.78;
+		var ctx = this.ctx;
+		var w = this.w;
+		var h = this.h;
+		var bgW = this.bg.naturalWidth;
+		var bgH = this.bg.naturalHeight;
+
+		if(this.bgDistance >= bgW - 1){
+			this.bgDistance = 0;
 		}
-		this.bgDistance = ++this.bgloop * this.bgSpeed;
-		ctx.drawImage(this.bg, 0, this.bgDistance-this.bgHeight, this.bgWidth, this.bgHeight);
-		ctx.drawImage(this.bg, 0, this.bgDistance, this.bgWidth, this.bgHeight);
-	},*/
-	run : function(ctx){
+		this.bgDistance += .5;
+		// 分别绘制整体（下），上左，上右
+ 		ctx.drawImage(this.bg, 0, 0, w, h);
+		ctx.drawImage(this.bg, this.bgDistance, 0, bgW - this.bgDistance, bgH * tag, 0, 0, w * (bgW - this.bgDistance)/bgW , h * tag);
+		ctx.drawImage(this.bg, 0, 0, this.bgDistance, bgH * tag, (bgW - this.bgDistance)/bgW * w, 0, this.bgDistance/bgW * w, h * tag);
+	},
+	run : function(timestamp){
 		var _this = gameMonitor;
+
+		//清除画布的2种方式，不过这里直接覆盖绘制
 		//ctx.clearRect(0, 0, _this.bgWidth, _this.bgHeight);
-		//ctx.height = _this.h;
 		//ctx.width = _this.w;
 
-		//_this.rollBg(ctx);
-		ctx.drawImage(this.bg, 0, 0, _this.bgWidth, _this.bgHeight, 0, 0, _this.w, _this.h);
+		//绘制滚动背景
+		_this.rollBg();
+		
+		//直接粘贴背景
+		//_this.ctx.drawImage(this.bg, 0, 0, _this.bgWidth, _this.bgHeight, 0, 0, _this.w, _this.h);
 
 		//绘制飞船
 		_this.ship.paint();
@@ -314,23 +321,30 @@ var gameMonitor = {
 		for(i=_this.foodList.length-1; i>=0; i--){
 			var f = _this.foodList[i];
 			if(f){
-				f.paint(ctx);
-				f.move(ctx);
+				f.paint(_this.ctx);
+				f.move(_this.ctx);
 			}
 			
 		}
-		_this.timmer = setTimeout(function(){
-			gameMonitor.run(ctx);
-		}, Math.round(1000/60));
 
-		_this.time++;
+		// android >= 4.3,还需要大改
+		if ( window.requestAnimationFrame ) {
+			_this.timmer = requestAnimationFrame(_this.run);
+		}else{
+			_this.timmer = setTimeout(function(){
+				_this.run();
+			}, Math.round(1000/60));
+
+			_this.time++;
+		}
 	},
 	//mantou: game state save, can run.
 	stop : function(){
-		var _this = this
+		var _this = this;
+		var cleartimmer = window.cancelAnimationFrame || window.clearTimeout;
 		$('#stage').off(gameMonitor.eventType.start + ' ' +gameMonitor.eventType.move);
 		setTimeout(function(){
-			clearTimeout(_this.timmer);
+			cleartimmer(_this.timmer);
 		}, 0);
 		
 	},
@@ -341,7 +355,7 @@ var gameMonitor = {
 			var left = Math.random()*this.w -80/2;
 			var type = Math.floor(left)%3 < 2 ? 0 : 1;
 			var id = this.foodList.length;
-			var f = new Food(type, left, id, this.icons);
+			var f = new Food(type, left, id, this.ctx);
 			this.foodList.push(f);
 		}
 	},
