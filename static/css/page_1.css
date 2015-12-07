@@ -1,0 +1,283 @@
+#page_1{
+	background-color: rgb(230, 232, 235);
+	overflow: auto;
+}
+#page_1 section{
+	background: #fff;
+	-webkit-background-clip: border-box;
+	-moz-background-clip: border-box;
+	background-clip: border-box;
+	margin-bottom: 0.3rem;
+	padding: .5rem .5rem 0;
+	font-size: 0.5rem;
+}
+#page_1 section h1,#page_1 section h2{
+	font-weight: 300;
+	text-align: center;
+	margin: 0;
+	padding: 0;	
+}
+#page_1 section h1{
+	color: rgb(74, 138, 245);
+	font-size: 1.2em;
+	line-height: 1.5em;
+}
+#page_1 section h2{
+	font-size: 0.8em;
+	line-height: 1em;
+}
+#page_1 section .content{
+	margin-top: .3rem;
+	border: 1px solid rgb(230, 232, 235);
+}
+#page_1 .avatars{
+	background-clip: border-box;
+	padding: 0 1rem;
+	color: rgb(229, 240, 251);
+	position: relative;
+}
+#page_1 .avatars .content div{
+	margin: .75rem;
+	float: left;
+	width: 2.5rem;
+	height: 2.5rem;
+	border-radius: 50%;
+	border: 0.1rem solid;
+	overflow: hidden;
+}
+#page_1 .avatars .content{
+	border: none;
+	margin-top: 0;
+}
+#page_1 .avatars img{
+	height: 100%;
+}
+#page_1 .avatars .content div:nth-child(n+3){
+	border-color: rgb(254, 242, 246);
+	margin-top: 0;
+}
+#page_1 .avatars .content::after{
+	clear: both;
+	content: '';
+	display: block;
+	width: .1rem;
+	height: .1rem;
+	border-radius: 50%;
+	color: rgb(255, 124, 124);
+	background: currentColor;
+	box-shadow: 0.4rem 0 0 0 currentColor,
+				0.8rem 0 0 0 currentColor,
+				1.2rem 0 0 0 currentColor,
+				1.6rem 0 0 0 currentColor,
+				2.0rem 0 0 0 currentColor,
+				2.4rem 0 0 0 currentColor,
+				2.8rem 0 0 0 currentColor,
+				3.2rem 0 0 0 currentColor,
+				3.6rem 0 0 0 currentColor,
+				4.0rem 0 0 0 currentColor,
+				4.4rem 0 0 0 currentColor,
+				4.8rem 0 0 0 currentColor,
+				5.2rem 0 0 0 currentColor,
+				5.6rem 0 0 0 currentColor,
+				6.0rem 0 0 0 currentColor,
+				6.4rem 0 0 0 currentColor,
+				6.8rem 0 0 0 currentColor,
+				7.2rem 0 0 0 currentColor,
+				7.6rem 0 0 0 currentColor,
+				8.0rem 0 0 0 currentColor;
+}
+#page_1 .avatars::before,#page_1 .avatars::after{
+	background: rgb(230, 232, 235);
+	display: block;
+	content: '';
+	clear: both;
+	position: absolute;
+	bottom: 0;
+	width: .5rem;
+	height: .5rem;
+}
+#page_1 .avatars::before{
+	left: 0;
+	border-top-right-radius: 100%;
+}
+#page_1 .avatars::after{
+	right: 0;
+	border-top-left-radius: 100%;
+}
+#page_1 section.feed .content p{
+	margin: .2rem .5rem;
+	line-height: 1.5em;
+}
+#page_1 section.feed .content .updateTime{
+	font-size: 0.5em;
+	color: rgb(200, 200, 200);
+}
+#page_1 section.feed .content .topic{
+	margin-bottom: .8em;
+}
+#page_1 section.feed .content .reply{
+	position: relative;
+	font-size: 0.8em;
+	color: rgb(127, 127, 127);
+	border-radius: 1000px;
+	background: rgb(247, 247, 247);
+	padding: .2rem;
+	margin-bottom: .8em;
+}
+#page_1 section.feed .content .reply::before,#page_1 section.feed .content .reply::after{
+	content: '';
+	display: block;
+	position: absolute;
+	top: 100%;
+	left: 3em;
+	height: 0.8em;
+	border-bottom-right-radius: 100%;
+}
+
+#page_1 section.feed .content .reply::after{
+	background: #fff;
+	width: .6em;
+}
+#page_1 section.feed .content .reply::before{
+	background: inherit;
+	width: 1.4em;
+}
+#page_1 section.feed .content .icons{
+	margin: 1em 0.5rem;
+	color: rgb(139, 150, 163);
+	height: 1em;
+}
+#page_1 section.feed .more{
+	float: right;
+	letter-spacing: -0.5em;
+}
+#page_1 section.feed .content .icons div{
+	display: inline-block;
+}
+#page_1 section.feed .icons div + div{
+	margin-left: 1em;
+}
+
+#page_1 section.feed .love {
+	margin-right: .5em;
+	position:relative;
+	width:.5em;
+	height:.5em;
+	border:.1em solid;
+	border-width: 0 .1em .1em 0;
+	transform-origin:0 0;
+	transform:rotate(45deg)
+}
+#page_1 section.feed .love::after,#page_1 section.feed .love::before {
+	content: '';
+	display:block;
+	width:100%;
+	height:100%;
+	position:absolute;
+	border:.1em solid;
+	top:-0.1em;
+	left:-0.1em;
+	transform-origin:0 0;
+	border-top-left-radius:50%;
+}
+#page_1 section.feed .love::before {
+	transform:translateX( calc(.1em - 100%) );
+	border-right-width: 0; 
+	border-bottom-left-radius:50%;
+}
+#page_1 section.feed .love::after {
+	transform:translateY(calc(.1em - 100%) );
+	border-bottom-width: 0; 
+	border-top-right-radius:50%;
+}
+#page_1 section.feed .comment{
+	position: relative;
+	height: 1em;
+	width: 1.5em;
+	border-radius: 50%;
+	border:.1em solid;
+	transform-origin: 0 100%;
+	transform: scale(0.9);
+	margin-right: .2em;
+}
+#page_1 section.feed .comment i{
+	position: absolute;
+	display: block;
+	width: .1em;
+	height: .1em;
+	top: calc(50% - 0.05em);
+	left: calc(50% - 0.05em);
+	border-radius: 50%;
+	background: currentColor;
+	box-shadow: -0.3em 0 0 0 currentColor,
+				 0.3em 0 0 0 currentColor;
+}
+#page_1 section.feed .comment::before,#page_1 section.feed .comment::after{
+	content: '';
+	display: block;
+	position: absolute;
+	top: 100%;
+	left: 0.1em;
+	height: 0.3em;
+	border-right: .1em solid currentColor;
+	border-bottom-right-radius: 100%;
+}
+
+#page_1 section.feed .comment::after{
+	width: .3em;
+}
+#page_1 section.feed .comment::before{
+	width: 0.8em;
+	background: #fff;
+}
+
+#page_1 section.information .content{
+	background: rgb(235, 82, 97);
+	color: rgb(252, 231, 233);
+}
+#page_1 section.information p{
+	margin: 1em;
+	font-size:.8em;
+}
+#page_1 section.information p span {
+	border-radius:1000px;
+	border:1px solid currentColor;
+	padding: 0 .5em;
+	line-height: 1.5em;
+}
+#page_1 section.information p.title span {
+	color:#8e323a;
+	border:none;
+}
+#page_1 section.qr{
+	padding-left: 0;
+	padding-right: 0;
+}
+#page_1 section.qr h1{
+	padding-bottom: 0.5rem;
+}
+#page_1 section.qr .content{
+	background: rgb(230, 232, 235);
+	margin: 0;
+}
+#page_1 section.qr .content div {
+	width:30%;
+	margin:10%;
+	float: left;
+}
+#page_1 section.qr .content div img {
+	width:100%
+}
+#page_1 section.qr .content div p {
+	padding:.5em;
+	font-size:0.5rem;
+	color: #fff;
+	text-align: center;
+	border-radius:1000px
+}
+#page_1 section.qr .content div:nth-child(1) p{
+	background-color: rgb(233, 30, 99);
+}
+#page_1 section.qr .content div:nth-last-child(1) p{
+	background-color: rgb(66, 133, 244);
+}

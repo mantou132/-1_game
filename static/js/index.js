@@ -100,7 +100,7 @@ function Food(type, left, id, ctx){
 	this.speed = 0.08 * Math.pow(1.1, Math.floor(gameMonitor.time/this.speedUpTime));
 	this.loop = 0;
 	this.angle = 0;
-	this.angleable = !(type || Math.random() < .8);
+	this.angleable = !(type || Math.random() < .9);
 
 	var icon = gameMonitor.icons[Math.floor(Math.random()*gameMonitor.icons.length)];
 	var p = this.type == 0 ? icon : gameMonitor.icon_fg.src;
@@ -144,13 +144,12 @@ function ImageMonitor(){
 		},
 		loadImage : function(arr, callback){
 			var l = arr.length;
-			//asyn load img, onload event is callback function fangzaizhixingduilie,namezhixingduilieshishenme.
 			for(var i=0; i<l; i++){
 				var img = arr[i];
 				imgArray[img] = new Image();
 				imgArray[img].onload = function(){
 					console.log('loaded: ' + this.src);
-					--l;
+					--l;//script runed then --l.
 					if(!l && typeof callback=='function'){
 						callback();
 					}
@@ -194,7 +193,7 @@ var gameMonitor = {
 		_this.ctx.canvas.height = h;
 
 		//初始某些元件尺寸，适应设备尺寸
-		// $('#scorecontent').css('font-size',_this.w/35);
+		$('#scorecontent').css('font-size',_this.w/30);
 		$(document.body).css('height',_this.h);
 
 		//绘制景
@@ -239,24 +238,28 @@ var gameMonitor = {
 	initListener : function(){
 		var _this = this;
 		var body = $(document.body);
-		$(document).on(gameMonitor.eventType.move, function(event){
-			event.preventDefault();
-		});
+		// $(document).on(gameMonitor.eventType.move, function(event){
+		// 	event.preventDefault();
+		// });
 		body.on(gameMonitor.eventType.start, '#replay', function(event){
 			$('#resultPanel').hide();
-			_this.ship = new Ship(event.data);
+			_this.ship = new Ship(_this.ctx);
       		_this.ship.controll();
       		_this.reset();
 			_this.run();
 		});
 		body.on(gameMonitor.eventType.start, '#share', function(event){
-			//???
+			$('#weixin').show();
+		});
+		body.on(gameMonitor.eventType.start, '#weixin', function(event){
+			$('#weixin').hide();
 		});
 		body.on(gameMonitor.eventType.start, '#btn_1', function(event){
-			//show +1 share page
+			$('#page_1').show();
+			$('#page_1').css('width',_this.w + _this.w - $('#page_1')[0].scrollWidth);
 		});
 		body.on(gameMonitor.eventType.start, '#btn_9', function(event){
-			//show 9 share page
+			$('#page_9').show();
 		});
 
 		// body.on(gameMonitor.eventType.start, '#frontpage', function(){
@@ -297,7 +300,7 @@ var gameMonitor = {
 		ctx.drawImage(this.bg, 0, 0, this.bgDistance, bgH * tag, (bgW - this.bgDistance)/bgW * w, 0, this.bgDistance/bgW * w, h * tag);
 	},
 	run : function(timestamp){
-		var _this = gameMonitor;
+		var _this = this;
 
 		//清除画布的2种方式，不过这里直接覆盖绘制
 		//ctx.clearRect(0, 0, _this.bgWidth, _this.bgHeight);
@@ -328,10 +331,12 @@ var gameMonitor = {
 		}
 
 		// android >= 4.3,还需要大改
-		if ( window.requestAnimationFrame ) {
-			_this.timmer = requestAnimationFrame(_this.run);
+		if ( window.requestAnimationFrame1 ) {
+			_this.timmer = requestAnimationFrame(function(){//next run
+				_this.run();
+			});
 		}else{
-			_this.timmer = setTimeout(function(){
+			_this.timmer = setTimeout(function(timestamp){
 				_this.run();
 			}, Math.round(1000/60));
 
@@ -341,7 +346,7 @@ var gameMonitor = {
 	//mantou: game state save, can run.
 	stop : function(){
 		var _this = this;
-		var cleartimmer = window.cancelAnimationFrame || window.clearTimeout;
+		var cleartimmer = window.cancelAnimationFrame1 || window.clearTimeout;
 		$('#stage').off(gameMonitor.eventType.start + ' ' +gameMonitor.eventType.move);
 		setTimeout(function(){
 			cleartimmer(_this.timmer);
@@ -349,7 +354,7 @@ var gameMonitor = {
 		
 	},
 	genorateFood : function(){
-		var genRate = 30; //产生one fp/n
+		var genRate = 50 / Math.pow(this.score+1, 1/3); //产生one fp/n
 		var random = Math.random();
 		if(random*genRate>genRate-1){
 			var left = Math.random()*this.w -80/2;
@@ -370,38 +375,12 @@ var gameMonitor = {
 	getScore : function(){
 		
 		var score = this.score;
-		/*var time = Math.floor(this.time/60);
-		var user = 1;*/
 		if(score==0){
 			$('#scorecontent').html('真桑心，肯定是因为没有认真玩的原因！要不再重新来一次！');
-			// $('.btn1').text('本大侠再战一次').removeClass('share').addClass('playagain');
-			// $('#fenghao').removeClass('geili yinhen').addClass('yinhen');
 			return;
-		}/*
-		else if(score<10){
-			user = 2;
 		}
-		else if(score>10 && score<=20){
-			user = 10;
-		}
-		else if(score>20 && score<=40){
-			user = 40;
-		}
-		else if(score>40 && score<=60){
-			user = 80;
-		}
-		else if(score>60 && score<=80){
-			user = 92;
-		}
-		else if(score>80){
-			user = 99;
-		}
-		$('#fenghao').removeClass('geili yinhen').addClass('geili');*/
 		$('#scorecontent').html('哎呦，不错哦！你将在<span id="sscore" class="lighttext">21341</span>段桃花运后遇见自己的真爱哦！');
-		//$('#stime').text(time);
 		$('#sscore').text(score);
-		//$('#suser').text(user+'%');
-		//$('.btn1').text('这么好的运气，一定要到小伙伴们那边得瑟得瑟！').removeClass('playagain').addClass('share');
 	},
 	isMobile : function(){
 		var sUserAgent= navigator.userAgent.toLowerCase(),
@@ -424,4 +403,4 @@ if(!gameMonitor.isMobile()){
 }
 
 // alert(innerWidth);
-gameMonitor.init(gameMonitor.isMobile() ? innerWidth : ($(document.body).css('width','320px'), 320),gameMonitor.isMobile() ? innerHeight : 568);//w,h
+gameMonitor.init(gameMonitor.isMobile() ? ($(document.documentElement).css('font-size',innerWidth / 10), innerWidth) : ($(document.body).css('width','320px'), $(document.documentElement).css('font-size',"32px"), 320),gameMonitor.isMobile() ? innerHeight : 568);//w,h
