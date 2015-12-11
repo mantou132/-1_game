@@ -6,7 +6,6 @@ html, body{
 	position: relative;
 	margin: 0;
 	overflow: hidden;
-	-webkit-user-select:none;
 	-webkit-tap-highlight-color: transparent;
 }
 body{
@@ -46,6 +45,7 @@ a{
 }
 
 .score-wrap {
+	pointer-events: none;
 	background: url(../img/ic_scores.png) no-repeat;
 	background-size: 100%;
 	color: #FFF;
@@ -146,7 +146,7 @@ div.hearthot {
 	-webkit-animation: tran_pop .2s .2s linear;
 	animation: tran_pop .2s .2s cubic-bezier(.84,.63,.62,1.47);
 }
-#replay,#share,#btn_1,#btn_9{
+#replay,#share,#btn_1,#btn_9,#finger{
 	cursor: pointer;
 	position: absolute;
 }
@@ -158,27 +158,78 @@ div.hearthot {
 #share{
 	width: 30%;
     height: 6%;
-    top: 31%;
+    top: 32%;
     left: 35%;
 }
 #btn_9{
-	width:20%;
-	height: 5%;
-	top:61%;
-	left: 30%;
+	width:40%;
+	height: 10%;
+	top:62%;
+	left: 10%;
 }
 #btn_1{
-	width:20%;
-	height: 5%;
-	top:61%;
-	left: 63%;
+	width:40%;
+	height: 10%;
+	top:60%;
+	left: 52%;
 }
+#finger{
+	pointer-events: none;
+	background: transparent url(../img/ic_finger.png) no-repeat scroll 0px 0 / 100% auto;
+	width: 1rem;
+	height: 1.5rem;
+	top: 70%;
+	left: 30%;
+	-webkit-animation: finger 3s linear 0s infinite alternate;
+	-o-animation: finger 3s linear 0s infinite alternate;
+	animation: finger 3s linear 0s infinite alternate;
+	}
 #weixin,#page_1,#page_9{
 	display: none;
 	position: absolute;
 	top: 0;
+	left: 0;
 	width: 100%;
 	height: 100%;
+}
+/*#page_1{
+	-webkit-border-image: url("../img/game_6.png") 360 0 552/4.8rem 0 7.36rem;
+	border-image-slice: 360 0 552 fill;
+	
+	border-image-width: 4.8rem 0 7.36rem 0;
+	border-image-outset: 0;
+	border-image-repeat: stretch stretch; 
+	border-image-source: url("../img/game_6.png");
+}*/
+#page_1::before,#page_1::after{
+	display: block;
+	content: '';
+	position: absolute;
+	width: 100%;
+	background-image: url("../img/game_6.png");
+	background-size: 100% auto;
+}
+#page_1::before{
+	top: 0;
+	height: 10.43rem;
+	background-position: top;
+}
+#page_1::after{
+	z-index: 1;
+	bottom: 0;
+	height: 7.36rem;
+	background-position: bottom;
+}
+#page_1 a{
+	z-index: 2;
+	position: absolute;
+	bottom: 0;
+	height: 1.2rem;
+	width: 6rem;
+	margin: 5.5rem 2rem;
+}
+#page_9{
+	background-color: #fff;
 }
 #weixin{
 	text-align: right;
@@ -300,5 +351,43 @@ div.hearthot {
 
 	100% {
 		transform: scale(1);
+	}
+}
+@-webkit-keyframes finger{
+	0% {
+		left:30%;
+		top: 70%;
+	}
+	44% {
+		left:30%;
+	}
+	44% {
+		left:30%;
+	}
+	55% {
+		left:60%;
+		top:68%;
+	}
+	100% {
+		left:60%;
+	}
+}
+@keyframes finger{
+	0% {
+		left:30%;
+		top: 70%;
+	}
+	44% {
+		left:30%;
+	}
+	44% {
+		left:30%;
+	}
+	55% {
+		left:60%;
+		top:68%;
+	}
+	100% {
+		left:60%;
 	}
 }

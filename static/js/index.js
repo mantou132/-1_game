@@ -72,7 +72,7 @@ function Ship(ctx){
 							$('#gameoverPanel').hide();
 							$('#resultPanel').show();
 							gameMonitor.getScore();
-						}, 3000);
+						}, 2000);
 					}
 					else{
 						$('#score').text(++gameMonitor.score);
@@ -156,7 +156,7 @@ function ImageMonitor(){
 					this.loaded = true;
 				}
 				imgArray[img].src = img
-				console.log('loadding: ' + img);
+				console.log('loading: ' + img);
 			}
 		}
 	}
@@ -179,6 +179,8 @@ var gameMonitor = {
 	start : null, //动画状态
 	ctx : document.getElementById('stage').getContext('2d'), //canvas 2D上下文引用
 	//audio : new Audio(''), //加分播放音频
+	bgAudio : new Audio(''),
+	shareTitle: '旧物回收，+1开启新生活',
 	eventType : { // 事件模式
 		start : 'touchstart',
 		move : 'touchmove',
@@ -192,14 +194,27 @@ var gameMonitor = {
 		_this.ctx.canvas.width = w;
 		_this.ctx.canvas.height = h;
 
+		document.title = _this.shareTitle;
+
 		//初始某些元件尺寸，适应设备尺寸
 		$('#scorecontent').css('font-size',_this.w/30);
 		$(document.body).css('height',_this.h);
+
+		try{
+			screen.orientation.lock('portrait')
+				.then(function(argument) {
+					console.log(argument);
+				});
+		} catch(e){
+			try{ screen.mozLockOrientation('portrait'); }
+			catch(e){console.log('non Orientation')}
+		}
 
 		//绘制景
 		_this.bg.src = 'static/img/im_gamebg.png';
 		_this.fg.src = 'static/img/ic_gamecharacter.png';
 		_this.icon_fg.src = 'static/img/icon/ic_heart.png';
+		var ic_gguide = ['static/img/ic_gguide.png','static/img/icon.png'];
 
 
 		_this.icons = [
@@ -220,17 +235,14 @@ var gameMonitor = {
 					'static/img/icon/icon_category_weibolu copy 13@3x.png',
 					'static/img/icon/icon_category_xiyiji copy 14@3x.png',
 				];
-		var loading = this.icons.concat(_this.bg.src,_this.fg.src,_this.icon_fg.src);
+		var loading = this.icons.concat(_this.bg.src,_this.fg.src,_this.icon_fg.src,ic_gguide);
 
-		_this.bg.addEventListener('load', function () {
-			_this.ctx.drawImage(_this.bg, 0, 0, _this.w, _this.h);
-		}, false);
-
-		console.log('loding start...');
+		console.log('loading start...');
 		_this.im.loadImage(loading,function(){
+			_this.ctx.drawImage(_this.bg, 0, 0, _this.w, _this.h);
+			$('#guidePanel').css('background-image','url(' + ic_gguide[0] + '),url(' + ic_gguide[1] + ')');
 			$('#loadingText').hide();
-			$('#guidePanel').css('background-image','url(static/img/ic_gguide.png),url(static/img/icon.png)')
-			console.log('loding end');
+			console.log('loading end');
 			_this.initListener();
 		})
 	},
@@ -247,6 +259,7 @@ var gameMonitor = {
       		_this.ship.controll();
       		_this.reset();
 			_this.run();
+			_this.bgAudioPaly();
 		});
 		body.on(gameMonitor.eventType.start, '#share', function(event){
 			$('#weixin').show();
@@ -256,10 +269,20 @@ var gameMonitor = {
 		});
 		body.on(gameMonitor.eventType.start, '#btn_1', function(event){
 			$('#page_1').show();
-			$('#page_1').css('width',_this.w + _this.w - $('#page_1')[0].scrollWidth);
+			$.get('/visit/jiayi');
+			// $('#page_1').css('width',_this.w + _this.w - $('#page_1')[0].scrollWidth);
 		});
 		body.on(gameMonitor.eventType.start, '#btn_9', function(event){
-			$('#page_9').show();
+			// $('#page_9').show();
+			$.ajax({
+				url: '/visit/tuzibenyue', 
+				success: function(res){
+					location.href = 'http://js-9beike-cn.b0.upaiyun.com/actives/jiayi/index.html';
+				},
+				error: function(xhr, type){
+					location.href = 'http://js-9beike-cn.b0.upaiyun.com/actives/jiayi/index.html';
+				}
+			});
 		});
 
 		// body.on(gameMonitor.eventType.start, '#frontpage', function(){
@@ -272,7 +295,14 @@ var gameMonitor = {
 			_this.ship.paint();
       		_this.ship.controll();
 			_this.run();
+			_this.bgAudioPaly();
 		});
+
+		_this.bgAudio.addEventListener('ended', function () {
+			setTimeout(function(){
+				_this.bgAudioPaly;
+			}, 3000);
+		},false)
 
 		// body.on(gameMonitor.eventType.start, '.share', function(){
 		// 	$('.share_page').show().on(gameMonitor.eventType.start, function(){
@@ -280,6 +310,29 @@ var gameMonitor = {
 		// 	});
 		// });
 
+	},
+	bgAudioPaly : function(e) {
+			var a = this.bgAudio;
+			a.play();
+			a.volume = 0;
+			var timer = setInterval(function() {
+				if (a.volume <  0.5) {
+					a.volume = (a.volume + 0.1).toFixed(1);
+				}else{
+					clearInterval(timer);
+				}
+			}, 200);
+	},
+	bgAudioPause : function(e) {
+			var a = this.bgAudio;
+			var timer = setInterval(function() {
+				if (a.volume >  0) {
+					a.volume = (a.volume - 0.1).toFixed(1);
+				}else{
+					clearInterval(timer);
+					a.pause();
+				}
+			}, 200);
 	},
 	//手动设置滚动位置 0.78
 	rollBg : function(){
@@ -294,8 +347,7 @@ var gameMonitor = {
 			this.bgDistance = 0;
 		}
 		this.bgDistance += .5;
-		// 分别绘制整体（下），上左，上右
- 		ctx.drawImage(this.bg, 0, 0, w, h);
+		// 分别绘制上左，上右
 		ctx.drawImage(this.bg, this.bgDistance, 0, bgW - this.bgDistance, bgH * tag, 0, 0, w * (bgW - this.bgDistance)/bgW , h * tag);
 		ctx.drawImage(this.bg, 0, 0, this.bgDistance, bgH * tag, (bgW - this.bgDistance)/bgW * w, 0, this.bgDistance/bgW * w, h * tag);
 	},
@@ -305,19 +357,21 @@ var gameMonitor = {
 		//清除画布的2种方式，不过这里直接覆盖绘制
 		//ctx.clearRect(0, 0, _this.bgWidth, _this.bgHeight);
 		//ctx.width = _this.w;
+		
+		//直接粘贴背景
+		_this.ctx.drawImage(_this.bg, 0, 0, _this.w, _this.h);
 
 		//绘制滚动背景
 		_this.rollBg();
-		
-		//直接粘贴背景
-		//_this.ctx.drawImage(this.bg, 0, 0, _this.bgWidth, _this.bgHeight, 0, 0, _this.w, _this.h);
 
 		//绘制飞船
 		_this.ship.paint();
+
+		// check
 		_this.ship.eat(_this.foodList);
 
 
-		//产生
+		//产生icon
 		_this.genorateFood();
 
 		//绘制
@@ -336,8 +390,8 @@ var gameMonitor = {
 				_this.run();
 			});
 		}else{
-			_this.timmer = setTimeout(function(timestamp){
-				_this.run();
+			_this.timmer = setTimeout(function(){
+				_this.run();//可以直接使用函数名
 			}, Math.round(1000/60));
 
 			_this.time++;
@@ -351,6 +405,7 @@ var gameMonitor = {
 		setTimeout(function(){
 			cleartimmer(_this.timmer);
 		}, 0);
+		_this.bgAudioPause();
 		
 	},
 	genorateFood : function(){
@@ -371,16 +426,31 @@ var gameMonitor = {
 		this.timmer = null;
 		this.time = 0;
 		$('#score').text(this.score);
+		document.title = this.shareTitle;
 	},
 	getScore : function(){
-		
+		var p;
 		var score = this.score;
 		if(score==0){
 			$('#scorecontent').html('真桑心，肯定是因为没有认真玩的原因！要不再重新来一次！');
+			document.title = '真桑心，缺爱';
 			return;
-		}
-		$('#scorecontent').html('哎呦，不错哦！你将在<span id="sscore" class="lighttext">21341</span>段桃花运后遇见自己的真爱哦！');
-		$('#sscore').text(score);
+		} else if (score >= 1 && score <= 5) {
+            p = '60%';
+        } else if (score >= 6 && score <= 10) {
+            p = '70%';
+        } else if (score >= 11 && score <= 15) {
+            p = '80%';
+        } else if (score >= 16 && score <= 20) {
+            p = '90%';
+        } else if (score >= 21 && score <= 25) {
+            p = '100%';
+        }
+		$('#scorecontent').html('哎呦，不错哦！你遇见真爱的系数为'+ score +'！');
+		document.title = '我接到了'+ score +'颗爱心！2016年，' + 
+		(score < 26 ? 
+		('我遇见真爱的几率居然有'+ p +'！') :
+        '我居然可以和心爱的TA领证了！！');
 	},
 	isMobile : function(){
 		var sUserAgent= navigator.userAgent.toLowerCase(),
@@ -403,4 +473,5 @@ if(!gameMonitor.isMobile()){
 }
 
 // alert(innerWidth);
-gameMonitor.init(gameMonitor.isMobile() ? ($(document.documentElement).css('font-size',innerWidth / 10), innerWidth) : ($(document.body).css('width','320px'), $(document.documentElement).css('font-size',"32px"), 320),gameMonitor.isMobile() ? innerHeight : 568);//w,h
+// gameMonitor.init(gameMonitor.isMobile() ? ($(document.documentElement).css('font-size',innerWidth / 10), innerWidth) : ($(document.body).css('width','320px'), $(document.documentElement).css('font-size',"32px"), 320),gameMonitor.isMobile() ? innerHeight : 568);//w,h
+gameMonitor.init(($(document.documentElement).css('font-size',innerWidth / 10), innerWidth), innerHeight);//w,h

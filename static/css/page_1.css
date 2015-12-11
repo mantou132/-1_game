@@ -121,7 +121,7 @@
 	color: rgb(127, 127, 127);
 	border-radius: 1000px;
 	background: rgb(247, 247, 247);
-	padding: .2rem;
+	padding: .2rem .4rem;
 	margin-bottom: .8em;
 }
 #page_1 section.feed .content .reply::before,#page_1 section.feed .content .reply::after{
@@ -160,13 +160,16 @@
 
 #page_1 section.feed .love {
 	margin-right: .5em;
+	margin-left: 0.8em;
 	position:relative;
 	width:.5em;
 	height:.5em;
 	border:.1em solid;
 	border-width: 0 .1em .1em 0;
+	-webkit-transform-origin:0 0;
 	transform-origin:0 0;
-	transform:rotate(45deg)
+	-webkit-transform:rotate(45deg);
+	transform:rotate(45deg);
 }
 #page_1 section.feed .love::after,#page_1 section.feed .love::before {
 	content: '';
@@ -177,15 +180,18 @@
 	border:.1em solid;
 	top:-0.1em;
 	left:-0.1em;
+	-webkit-transform-origin:0 0;
 	transform-origin:0 0;
 	border-top-left-radius:50%;
 }
 #page_1 section.feed .love::before {
+	-webkit-transform:translateX( calc(.1em - 100%) );
 	transform:translateX( calc(.1em - 100%) );
 	border-right-width: 0; 
 	border-bottom-left-radius:50%;
 }
 #page_1 section.feed .love::after {
+	-webkit-transform:translateY(calc(.1em - 100%) );
 	transform:translateY(calc(.1em - 100%) );
 	border-bottom-width: 0; 
 	border-top-right-radius:50%;
@@ -196,8 +202,10 @@
 	width: 1.5em;
 	border-radius: 50%;
 	border:.1em solid;
+	-webkit-transform-origin: 0 100%;
 	transform-origin: 0 100%;
 	transform: scale(0.9);
+	-webkit-transform: scale(0.9);
 	margin-right: .2em;
 }
 #page_1 section.feed .comment i{
@@ -236,8 +244,13 @@
 	color: rgb(252, 231, 233);
 }
 #page_1 section.information p{
-	margin: 1em;
+	margin: 0 1em;
+	padding: 1em 0;
 	font-size:.8em;
+}
+#page_1 section.information p.impression{
+	color:#8e323a;
+	border-top: 1px solid;
 }
 #page_1 section.information p span {
 	border-radius:1000px;
@@ -269,8 +282,8 @@
 	width:100%
 }
 #page_1 section.qr .content div p {
-	padding:.5em;
-	font-size:0.5rem;
+	padding: .5em;
+	font-size: .4rem;
 	color: #fff;
 	text-align: center;
 	border-radius:1000px
